@@ -1,19 +1,21 @@
 #include "lists.h"
 
 /**
- * listint_count - counts the number of nodes in a linked list of integers
- * @head: pointer to the first node in the list
+ * listint_len - Returns the number of nodes in a linked list
+ * @head: Pointer to the first element of the list
  *
- * Return: the number of nodes in the list
+ * Return: Number of nodes in the linked list
  */
-size_t print_listint(const listint_t *h)
+size_t listint_len(const listint_t *head)
 {
-size_t count = 0;
+	size_t count = 0;
 
-for (; h != NULL; h = h->next)
-{
-printf("%d\n", h->next)
-	count ++;	;
+	while (head)
+	{
+		count++;
+		head = head->next;
+	}
+
+	return (count);
 }
-return(count);
-}
+
