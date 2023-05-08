@@ -3,105 +3,113 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#define BUFFER_SIZE 1024
-
-void print_error(int error_code, const char *filename1, const char *filename2, int fd);
-int copy_file(const char *filename1, const char *filename2);
+char *allocate_buffer(int buffer_size);
+void close_fd(int fd);
 
 /**
- * print_error - Prints the appropriate error message for the given error code.
- * @error_code: The error code to print the message for.
- * @filename1: The first filename to print in the error message.
- * @filename2: The second filename to print in the error message.
- * @fd: The file descriptor to print in the error message.
+ * allocate_buffer - Allocates memory for a buffer.
+ * @buffer_size: The size of the buffer.
+ *
+ * Return: A pointer to the newly-allocated buffer.
  */
-void print_error(int error_code, const char *filename1, const char *filename2, int fd)
+char *allocate_buffer(int buffer_size)
 {
-	switch (error_code)
+	char *buffer;
+
+	buffer = malloc(sizeof(char) * buffer_size);
+
+	if (buffer == NULL)
 	{
-		case 97:
-			dprintf(STDERR_FILENO, "Usage: cp file_from file_to\n");
-			break;
-		case 98:
-			dprintf(STDERR_FILENO, "Error: Can't read from file %s\n", filename1);
-			break;
-		case 99:
-			dprintf(STDERR_FILENO, "Error: Can't write to %s\n", filename2);
-			break;
-		case 100:
-			dprintf(STDERR_FILENO, "Error: Can't close fd %d\n", fd);
-			break;
-		default:
-			break;
+		perror("Error: Unable to allocate memory for buffer\n");
+		exit(EXIT_FAILURE);
+	}
+
+	return (buffer);
+}
+
+/**
+ * close_fd - Closes file descriptors.
+ * @fd: The file descriptor to be closed.
+ */
+void close_fd(int fd)
+{
+	int status;
+
+	status = close(fd);
+
+	if (status == -1)
+	{
+		perror("Error: Unable to close file descriptor\n");
+		exit(EXIT_FAILURE);
 	}
 }
 
 /**
- * copy_file - Copies the contents of a file to another file.
- * @filename1: The name of the file to copy from.
- * @filename2: The name of the file to copy to.
+ * main - Copies the contents of one file to another file.
+ * @argc: The number of arguments supplied to the program.
+ * @argv: An array of pointers to the arguments.
  *
- * Return: 0 on success, or an appropriate error code.
+ * Return: 0 on success.
+ *
+ * Description: If the argument count is incorrect - exit code 1.
+ * If source file cannot be opened - exit code 2.
+ * If destination file cannot be created or written to - exit code 3.
+ * If an error occurs while reading from the source or writing to the destination file - exit code 4.
  */
-int copy_file(const char *filename1, const char *filename2)
+int main(int argc, char *argv[])
 {
-	int fd1, fd2, r, w, c;
-	char buffer[BUFFER_SIZE];
+	int src_fd, dst_fd, read_size, write_size;
+	char *buffer;
+	const int BUFFER_SIZE = 1024;
 
-	if (!filename1 || !filename2)
-		return (-1);
-
-	fd1 = open(filename1, O_RDONLY);
-	if (fd1 == -1)
-		return (98);
-
-	fd2 = open(filename2, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
-	if (fd2 == -1)
+	if (argc != 3)
 	{
-		c = close(fd1);
-		if (c == -1)
-			print_error(100, NULL, NULL, fd1);
-		return (99);
+		printf("Usage: %s source_file destination_file\n", argv[0]);
+		exit(1);
 	}
 
-	do {
-		r = read(fd1, buffer, BUFFER_SIZE);
-		if (r == -1)
+	buffer = allocate_buffer(BUFFER_SIZE);
+	src_fd = open(argv[1], O_RDONLY);
+
+	if (src_fd == -1)
+	{
+		perror("Error: Unable to open source file\n");
+		free(buffer);
+		exit(2);
+	}
+
+	dst_fd = open(argv[2], O_CREAT | O_WRONLY | O_TRUNC, 0664);
+
+	if (dst_fd == -1)
+	{
+		perror("Error: Unable to create or write to destination file\n");
+		free(buffer);
+		close_fd(src_fd);
+		exit(3);
+	}
+
+	read_size = read(src_fd, buffer, BUFFER_SIZE);
+
+	while (read_size > 0)
+	{
+		write_size = write(dst_fd, buffer, read_size);
+
+		if (write_size == -1)
 		{
-			c = close(fd1);
-			if (c == -1)
-				print_error(100, NULL, NULL, fd1);
-			c = close(fd2);
-			if (c == -1)
-				print_error(100, NULL, NULL, fd2);
-			return (98);
+			perror("Error: Unable to write to destination file\n");
+			free(buffer);
+			close_fd(src_fd);
+			close_fd(dst_fd);
+			exit(4);
 		}
 
-		w = write(fd2, buffer, r);
-		if (w == -1)
-		{
-			c = close(fd1);
-			if (c == -1)
-				print_error(100, NULL, NULL, fd1);
-			c = close(fd2);
-			if (c == -1)
-				print_error(100, NULL, NULL, fd2);
-			return (99);
-		}
-
-	} while (r > 0);
-
-	c = close(fd1);
-	if (c == -1)
-	{
-		print_error(100, NULL, NULL, fd1);
-		return (100);
-	}
-	c = close(fd2);
-	if (c == -1)
-	{
-		print_error(100, NULL, NULL, fd2);
-		return (100);
+		read_size = read(src_fd, buffer, BUFFER_SIZE);
 	}
 
+	free(buffer);
+	close_fd(src_fd);
+	close_fd(dst_fd);
+
+	return (0);
+}
 
