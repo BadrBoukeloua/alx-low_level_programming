@@ -1,35 +1,41 @@
-#include "main.h"
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 /**
- * append_content_to_file - Appends the content of a string to the end of a file.
- *
+ * append_text_to_file - Appends text at the end of a file.
  * @filename: The name of the file to append to.
- * @content: The content to append to the file.
+ * @text_content: The NULL terminated string to add at the end of the file.
  *
- * Return: 1 if the function is successful, or -1 if an error occurs.
+ * Return: 1 on success, -1 on failure.
  */
-int append_content_to_file(const char *filename, char *content)
+int append_text_to_file(const char *filename, char *text_content)
 {
-    int file_descriptor, bytes_written, content_length = 0;
+	int fd, nbytes, wstatus;
 
-    if (filename == NULL)
-        return (-1);
+	if (filename == NULL)
+		return (-1);
 
-    if (content != NULL)
-    {
-        while (content[content_length])
-            content_length++;
-    }
+	fd = open(filename, O_WRONLY | O_APPEND);
+	if (fd == -1)
+		return (-1);
 
-    file_descriptor = open(filename, O_WRONLY | O_APPEND);
-    if (file_descriptor == -1)
-        return (-1);
+	if (text_content == NULL)
+	{
+		close(fd);
+		return (1);
+	}
 
-    bytes_written = write(file_descriptor, content, content_length);
-    if (bytes_written == -1)
-        return (-1);
+	nbytes = 0;
+	while (text_content[nbytes] != '\0')
+		nbytes++;
 
-    close(file_descriptor);
-    return (1);
+	wstatus = write(fd, text_content, nbytes);
+	close(fd);
+
+	if (wstatus == -1)
+		return (-1);
+
+	return (1);
 }
 
