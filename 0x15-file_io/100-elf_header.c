@@ -124,13 +124,13 @@ void print_version(unsigned char *ident)
 }
 /**
  * print_osabi - Prints the OS/ABI of an ELF header.
- * @e_ident: A pointer to an array containing the ELF version.
+ * @ident: A pointer to an array containing the ELF version.
  */
-void print_osabi(unsigned char *e_ident)
+void print_osabi(unsigned char *ident)
 {
     printf(" OS/ABI: ");
 
-    switch (e_ident[EI_OSABI])
+    switch (ident[EI_OSABI])
     {
     case ELFOSABI_NONE:
         printf("UNIX - System V\n");
@@ -163,16 +163,16 @@ void print_osabi(unsigned char *e_ident)
         printf("UNIX - TRU64\n");
         break;
     default:
-        printf("<unknown: %x>\n", e_ident[EI_OSABI]);
+        printf("<unknown: %x>\n", ident[EI_OSABI]);
     }
 }
 /**
  * print_abi_version - Prints the ABI version of an ELF header.
- * @e_ident: A pointer to an array containing the ELF ABI version.
+ * @ident: A pointer to an array containing the ELF ABI version.
  */
-void print_abi(unsigned char *e_ident)
+void print_abi(unsigned char *ident)
 {
-	printf("ABI Version: %d\n", e_ident[EI_ABIVERSION]);
+	printf("ABI Version: %d\n", ident[EI_ABIVERSION]);
 }
 /**
 
@@ -182,7 +182,7 @@ print_elf_type - Prints the type of an ELF header.
 
 @ident: A pointer to an array containing the ELF identification information.
 */
-void print_elf_type(unsigned int type, unsigned char *ident)
+void print_type(unsigned int type, unsigned char *ident)
 {
 if (ident[EI_DATA] == ELFDATA2MSB)
 type >>= 8;
@@ -215,7 +215,7 @@ printf("<Unknown type: %x>\n", type);
  * @entry_point: The address of the entry point.
  * @elf_class: A pointer to an array containing the ELF class.
  */
-void print_entry_point(unsigned long int entry_point, unsigned char *elf_class)
+void print_entry(unsigned long int entry, unsigned char *ident)
 {
 	printf("Entry Point Address: ");
 
@@ -238,7 +238,7 @@ void print_entry_point(unsigned long int entry_point, unsigned char *elf_class)
  *
  * Description: If the file cannot be closed, print an error message to stderr and exit with code 98.
  */
-void close_file(int fd)
+void close_elf(int fd)
 {
 	if (close(fd) == -1)
 	{
@@ -291,19 +291,18 @@ int main(int argc, char *argv[])
 		return (1);
 	}
 
-	check_elf(header->e_ident);
+	check_elf(header->ident);
 	printf("ELF Header:\n");
-	print_magic(header->e_ident);
-	print_class(header->e_ident);
-	print_data(header->e_ident);
-	print_version(header->e_ident);
-	print_osabi(header->e_ident);
-	print_abi(header->e_ident);
-	print_type(header->e_type, header->e_ident);
-	print_entry(header->e_entry, header->e_ident);
+	print_magic(header->ident);
+	print_class(header->ident);
+	print_data(header->ident);
+	print_version(header->ident);
+	print_osabi(header->ident);
+	print_abi(header->ident);
+	print_type(header->e_type, header->ident);
+	print_entry(header->e_entry, header->ident);
 
 	free(header);
 	close_elf(o);
 	return (0);
 }
-
