@@ -1,35 +1,26 @@
 #include "main.h"
 
-
 /**
- * print_binary - Prints number of int in a binary.
- * @n: Unsigned long int.
- *
- * Return: nothing.
- */
+
+* print_binary - converts a n number to binary and prints it
+
+* @n: number to convert and print in binary
+*/
 void print_binary(unsigned long int n)
 {
-    unsigned long int mask = 1UL << (sizeof(unsigned long int) * 8 - 1);
-    int found_one = 0;
+    int index;
 
-    if (n == 0)
+    unsigned long int mask = sizeof(n) * 8;
+
+    while (!(n & mask) && mask)
+        mask >>= 1;
+
+    while (mask)
     {
-        _putchar('0');
-        return;
-    }
-
-    while (mask != 0)
-    {
-        if (n & mask)
-        {
-            _putchar('1');
-            found_one = 1;
-        }
-        else if (found_one)
-        {
-            _putchar('0');
-        }
-
+        _putchar((n & mask) ? '1' : '0');
         mask >>= 1;
     }
+
+    if (!n)
+        _putchar('0');
 }
