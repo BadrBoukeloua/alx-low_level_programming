@@ -15,28 +15,25 @@
 */
 int append_text_to_file(const char *filename, char *text_content)
 {
-    FILE *file;
-    int result = -1;
+    int file_descriptor, result = -1;
     size_t len = 0;
+ if (filename == NULL) return -1;
 
-    if (filename == NULL)
-        return -1;
-
-    file = fopen(filename, "a");
-    if (file == NULL)
+    file_descriptor = open(filename, O_WRONLY | O_APPEND);
+    if (file_descriptor == -1)
         return -1;
 
     if (text_content != NULL)
     {
         len = strlen(text_content);
-        result = fwrite(text_content, sizeof(char), len, file);
-        if (result < len)
+        result = write(file_descriptor, text_content, len);
+        if (result == -1 || (size_t)result < len)
         {
-            fclose(file);
+            close(file_descriptor);
             return -1;
         }
     }
 
-    fclose(file);
+    close(file_descriptor);
     return 1;
 }
