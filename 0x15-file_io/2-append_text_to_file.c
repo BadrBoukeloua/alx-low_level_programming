@@ -11,29 +11,30 @@
  */
 int append_text_to_file(const char *filename, char *text_content)
 {
-FILE *file;
-int result = -1;
+	int fd, nbytes, wstatus;
 
-scss
-Copy code
-if (filename == NULL)
-    return -1;
+	if (filename == NULL)
+		return (-1);
 
-file = fopen(filename, "a");
-if (file == NULL)
-    return -1;
+	fd = open(filename, O_WRONLY | O_APPEND);
+	if (fd == -1)
+		return (-1);
 
-if (text_content != NULL)
-{
-    size_t len = strlen(text_content);
-    result = fwrite(text_content, sizeof(char), len, file);
-    if (result < len)
-    {
-        fclose(file);
-        return -1;
-    }
-}
+	if (text_content == NULL)
+	{
+		close(fd);
+		return (1);
+	}
 
-fclose(file);
-return 1;
+	nbytes = 0;
+	while (text_content[nbytes] != '\0')
+		nbytes++;
+
+	wstatus = write(fd, text_content, nbytes);
+	close(fd);
+
+	if (wstatus == -1)
+		return (-1);
+
+	return (1);
 }
