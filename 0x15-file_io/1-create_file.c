@@ -1,7 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
+#include "main.h"
+
 
 /**
 
@@ -15,27 +13,30 @@ Copy code
 */
 int create_file(const char *filename, char *text_content)
 {
+    FILE *file;
+    int result = -1;
+    size_t len = 0;
+
     if (filename == NULL)
         return -1;
 
-    int fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0600);
-    if (fd == -1)
+    file = fopen(filename, "w");
+    if (file == NULL)
         return -1;
 
     if (text_content != NULL)
     {
-        ssize_t len = 0;
         while (text_content[len] != '\0')
             len++;
-
-        ssize_t bytes_written = write(fd, text_content, len);
-        if (bytes_written == -1)
-        {
-            close(fd);
-            return -1;
-        }
     }
 
-    close(fd);
+    result = fwrite(text_content, sizeof(char), len, file);
+    if (result < len)
+    {
+        fclose(file);
+        return -1;
+    }
+
+    fclose(file);
     return 1;
 }
