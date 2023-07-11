@@ -1,6 +1,5 @@
 #include "main.h"
 
-
 /**
 
 create_file - Creates a file.
@@ -15,10 +14,8 @@ int create_file(const char *filename, char *text_content)
 {
     FILE *file;
     int result = -1;
-    size_t len = 0;
 
-    if (filename == NULL)
-        return -1;
+     if (filename == NULL) return -1;
 
     file = fopen(filename, "w");
     if (file == NULL)
@@ -26,15 +23,12 @@ int create_file(const char *filename, char *text_content)
 
     if (text_content != NULL)
     {
-        while (text_content[len] != '\0')
-            len++;
-    }
-
-    result = fwrite(text_content, sizeof(char), len, file);
-    if (result < len)
-    {
-        fclose(file);
-        return -1;
+        result = fprintf(file, "%s", text_content);
+        if (result < 0)
+        {
+            fclose(file);
+            return -1;
+        }
     }
 
     fclose(file);
