@@ -2,13 +2,13 @@
 
 /**
 
-clear_bit_to_zero - sets the value of a given bit to 0
+* clear_bit_to_zero - sets the value of a given bit to 0
 
-@decimal: pointer to the number to change
+* @decimal: the number to change
 
-@index: index of the bit to clear
+* @index: index of the bit 
 
-Return: 1 for success, -1 for failure
+* Return: 1 for success, -1 for failure
 */
 int clear_bit(unsigned long int *n, unsigned int index)
 {

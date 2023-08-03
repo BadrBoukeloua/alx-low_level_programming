@@ -2,9 +2,9 @@
 
 /**
 
-* print_binary - converts a n number to binary and prints it
+* print_binary - converts a number to binary and prints it
 
-* @n: number to convert and print in binary
+* @n: number to convert and print 
 */
 void print_binary(unsigned long int n)
 {

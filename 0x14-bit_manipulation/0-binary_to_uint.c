@@ -4,9 +4,9 @@
 
 * binary_to_unit - converts a binary number to decimal
 
-* @b: string containing the binary number
+* @b: string of the binary number
 
-* Return: the converted decimal number
+* Return: the decimal number
 */
 unsigned int binary_to_uint(const char *b)
 {

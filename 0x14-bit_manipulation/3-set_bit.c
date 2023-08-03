@@ -2,13 +2,13 @@
 
 /**
 
-set_bit_to_one - sets a bit at a given index to 1
+* set_bit_to_one - sets a bit at a given index to 1
 
-@decimal: pointer to the number to change
+* @decimal: the number to change
 
-@index: index of the bit to set to 1
+* @index: index of the bit
 
-Return: 1 for success, -1 for failure
+* Return: 1 for success, -1 for failure
 */
 int set_bit(unsigned long int *n, unsigned int index)
 {
