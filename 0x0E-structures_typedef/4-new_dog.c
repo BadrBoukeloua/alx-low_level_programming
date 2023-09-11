@@ -7,6 +7,7 @@
  *
  * Return: the length of the string
  */
+
 int _strlen(char *s)
 {
 	int i;
@@ -30,6 +31,7 @@ int _strlen(char *s)
  *
  * Return: the pointer to dest
  */
+
 char *_strcpy(char *dest, char *src)
 {
 	int len, i;
