@@ -2,6 +2,7 @@
 #include <string.h>
 #include "lists.h"
 
+
 /**
  * add_node - adds a new node at the beginning of a linked list
  * @head: double pointer to the list_t list
